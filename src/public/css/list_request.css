@@ -1,0 +1,61 @@
+.list-request {
+    max-width: 800px;
+    margin: 0 auto;
+    align-items: left;
+    display: flex;
+    flex-direction: column;
+}
+
+.list-request__title-text {
+    font-size: 22px;
+    font-weight: bold;
+    border-left: 6px solid #000;
+    padding: 2px 15px;
+    margin-top: 65px;
+}
+
+.list-request__tabs {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: row;
+    border-bottom: 1px solid #000;
+}
+
+.list-request__tab {
+    margin-left: 50px;
+}
+
+.t__head-tr {
+    border-bottom: 3px solid #e1e1e1;
+}
+
+.t__head-th {
+    color: #737373;
+    padding-left: 10px;
+}
+
+.t__body-td {
+    color: #737373;
+    padding-left: 0px;
+}
+
+.t__head th,
+.t__body td {
+    padding: 12px 24px;
+    /* 左右同じ値にするのがポイント */
+    text-align: center;
+    /* 全部中央揃えでOKならこれ */
+}
+
+.list-request__table {
+    background-color: #fff;
+    width: 100%;
+    margin-top: 40px;
+    border: none;
+    border-radius: 8px;
+    border-collapse: collapse;
+}
+
+.t__body {
+    
+}

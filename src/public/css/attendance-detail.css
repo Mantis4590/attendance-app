@@ -1,0 +1,59 @@
+.attendance-detail {
+    max-width: 800px;
+    margin: 0 auto;
+    align-items: left;
+    display: flex;
+    flex-direction: column;
+}
+
+.attendance-detail__title {
+    font-size: 22px;
+    font-weight: bold;
+    border-left: 6px solid #000;
+    padding: 2px 15px;
+    margin-top: 65px;
+}
+
+.attendance-detail__card {
+    background-color: #fff;
+    padding: 10px 20px;
+    border: 1px solid #fff;
+    border-radius: 6px;
+    
+}
+
+.attendance-detail__row {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 40px;
+    padding: 20px;
+}
+
+.attendance-detail__label {
+    width: 220px;
+    color: #737373;
+}
+
+.attendance-detail__value {
+    margin-left: 0;
+    font-weight: bold;
+}
+
+.attendance-detail__value:nth-of-type(3) {
+    left: 50px;
+}
+
+.attendance-detail__footer {
+    margin-top: 30px;
+    text-align: right;
+}
+
+.attendance-detail__button {
+    font-size: 18px;
+    color: #fff;
+    background-color: #000;
+    padding: 5px 35px;
+    border: 1px solid #000;
+    border-radius: 4px;
+}
