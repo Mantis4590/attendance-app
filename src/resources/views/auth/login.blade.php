@@ -10,7 +10,7 @@
         <div class="login__title-content">ログイン</div>
     </div>
 
-    <form action="{{ route('login.store') }}" method="POST" class="login__form">
+    <form action="{{ route('login.store') }}" method="POST" class="login__form" novalidate>
         @csrf
 
         {{-- メールアドレス --}}

@@ -22,7 +22,7 @@
         {{-- 出勤前 --}}
         <form action="{{ route('attendance.clockIn') }}" method="POST">
             @csrf
-            <button type="submit" class="index__button">出勤</button>
+            <button type="submit" class="index__button-start">出勤</button>
         </form>
 
     @elseif ($status === '出勤中')

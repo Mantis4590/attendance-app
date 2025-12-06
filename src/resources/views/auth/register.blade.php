@@ -10,7 +10,7 @@
         <div class="register__title-content">会員登録</div>
     </div>
 
-    <form action="{{ route('register.store') }}" method="POST" class="register__form">
+    <form action="{{ route('register.store') }}" method="POST" class="register__form" novalidate>
         @csrf
 
         {{-- 名前 --}}

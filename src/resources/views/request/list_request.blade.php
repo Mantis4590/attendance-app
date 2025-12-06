@@ -10,8 +10,9 @@
 
     {{-- タブ --}}
     <div class="list-request__tabs">
-        <div class="list-request__tab list-request__tab--active">承認待ち</div>
-        <div class="list-request__tab">承認済み</div>
+        <a href="{{ route('request.list', ['status' => 'pending']) }}" class="list-request__tab {{ $status === 'pending' ? 'list-request__tab--active' : '' }}">承認待ち</a>
+
+        <a href="{{ route('request.list', ['status' => 'approved']) }}" class="list-request__tab {{ $status === 'approved' ? 'list-request__tab--active' : '' }}">承認済み</a>
     </div>
 
     {{-- テーブル --}}
@@ -28,15 +29,25 @@
                 </tr>
             </thead>
             <tbody class="t__body">
-                {{-- 仮データ --}}
-                <tr>
-                    <td class="t__body-td">承認待ち</td>
-                    <td class="t__body-td">西 怜奈</td>
-                    <td class="t__body-td">2023/06/01</td>
-                    <td class="t__body-td">遅延のため</td>
-                    <td class="t__body-td">2023/06/02</td>
-                    <td><a href="#" class="list-request__detail-link">詳細</a></td>
-                </tr>
+                
+                @forelse ($requests as $req)
+                    <tr>
+                        <td class="t__body-td">{{ $req->status }}</td>
+                        <td class="t__body-td">{{ auth()->user()->name }}</td>
+                        <td class="t__body-td">{{ $req->date->format('Y/m/d') }}</td>
+                        <td class="t__body-td">{{ $req->note }}</td>
+                        <td class="t__body-td">{{ $req->updated_at->format('Y/m/d') }}</td>
+                        <td class="t__body-td">
+                            <a href="{{ route('attendance.detail', ['id' => $req->id]) }}" class="list-request__detail-link">詳細</a>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td class="t__body-td" colspan="6" style="text-align:center:">データがありません
+                        </td>
+                    </tr>
+                @endforelse
+
             </tbody>
         </table>
     </div>
