@@ -46,3 +46,24 @@
 .attendance-list__month-nav a.attendance-list__prev {
     color: #737373;
 }
+
+.attendance-list__current-month {
+    display: flex;
+    align-items: center;
+    /* ← これで縦位置が完全に中央揃え */
+    gap: 8px;
+    color: #000;
+    font-weight: bold;
+}
+
+.attendance-list__icon {
+    width: 26px;
+    height: 26px;
+    fill: #555;
+}
+
+.detail-btn {
+    text-decoration: none;
+    color: #000;
+    font-weight: bold;
+}

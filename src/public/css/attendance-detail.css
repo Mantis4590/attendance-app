@@ -12,9 +12,10 @@
     border-left: 6px solid #000;
     padding: 2px 15px;
     margin-top: 65px;
+    margin-bottom: 40px;
 }
 
-.attendance-detail__card {
+.attendance-detail__box {
     background-color: #fff;
     padding: 10px 20px;
     border: 1px solid #fff;
@@ -27,25 +28,26 @@
     justify-content: flex-start;
     align-items: center;
     gap: 40px;
-    padding: 20px;
+    padding: 25px 40px;
+    border-bottom: 1px solid #eee;
 }
 
 .attendance-detail__label {
-    width: 220px;
+    width: 260px;
     color: #737373;
+    text-align: left;
+    font-size: 15px;
 }
 
 .attendance-detail__value {
-    margin-left: 0;
+    display: flex;
+    align-items: center;
+    gap: 25px;
     font-weight: bold;
 }
 
-.attendance-detail__value:nth-of-type(3) {
-    left: 50px;
-}
-
 .attendance-detail__footer {
-    margin-top: 30px;
+    margin-top: 5px;
     text-align: right;
 }
 
@@ -56,4 +58,71 @@
     padding: 5px 35px;
     border: 1px solid #000;
     border-radius: 4px;
+    margin-top: 30px;
+}
+
+.attendance-detail__note {
+    color: #ff4444;
+    text-align: right;
+    font-size: 14px;
+}
+
+.attendance-detail__date {
+    display: flex;
+    justify-content: space-between;
+}
+
+.attendance-detail__year,
+.attendance-detail__day {
+    font-weight: bold;
+}
+
+.attendance-detail__value .time-input {
+    width: 80px;
+    height: 24px; /* ここ小さくできる */
+    padding: 0 6px;
+    border: 1px solid #cfcfcf;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box; /* ← これが最重要 */
+    text-align: center;
+}
+
+.attendance-detail__date,
+.attendance-detail__value--time {
+    width: 260px;
+    /* ←ここだけ好みで調整すれば揃う */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.attendance-detail__row:last-of-type {
+    border-bottom: none;
+}
+
+.note-input {
+    width: 260px;
+    min-height: 80px;
+    padding: 10px;
+    border: 1px solid #cfcfcf;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: 'Noto Sans JP', sans-serif;
+    box-sizing: border-box;
+
+    line-height: 1.4 !important;
+    /* ← これが “ズレ” を完全に殺す唯一の方法 */
+
+    resize: none;
+    overflow: auto;
+    white-space: pre-wrap;
+    font-weight: bold;
+}
+
+.input-error {
+    color: #ff4444;
+    font-size: 13px;
+    margin-top: 2px;
+    margin-left: 340px;;
 }
