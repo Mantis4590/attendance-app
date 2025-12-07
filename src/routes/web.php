@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\StampCorrectionRequestController;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\AdminAuthController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -41,9 +42,7 @@ Route::post('/register', [AuthController::class, 'store'])->name('register.store
 Route::post('/login', [AuthController::class, 'loginStore'])->name('login.store');
 Route::get('/stamp_correction_request/list', [AttendanceController::class, 'requestList'])
     ->name('request.list');
-
-
-
-
-
-
+Route::get('/admin/login', [AdminAuthController::class, 'login'])
+->name('admin.login');
+Route::post('/admin/login', [AdminAuthController::class, 'loginStore'])
+->name('admin.login.store');
