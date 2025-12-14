@@ -1,0 +1,102 @@
+.attendance__list {
+    max-width: 800px;
+    margin: 0 auto;
+    align-items: left;
+    display: flex;
+    flex-direction: column;
+}
+
+.attendance__list-title {
+    font-size: 22px;
+    font-weight: bold;
+    border-left: 6px solid #000;
+    padding: 2px 15px;
+    margin-top: 65px;
+}
+
+.attendance-list__nav {
+    display: flex;
+    flex-direction: row;
+    background-color: #fff;
+    border: 1px solid #fff;
+    border-radius: 6px;
+    padding: 10px 20px;
+    justify-content: space-between;
+    margin: 40px 0;
+    color: #737373;
+    text-decoration: none;
+}
+
+.attendance-list__nav-link {
+    text-decoration: none;
+    color: #737373;
+}
+
+.attendance-list__table {
+    background-color: #fff;
+    padding: 10px 20px;
+    align-items: left;
+}
+
+.attendance-list__th {
+    text-align: left;
+    color: #737373;
+}
+
+/* 1列目（名前）だけちょい右にする */
+.attendance-list__th:first-child,
+.attendance-list__td:first-child {
+    padding-left: 20px;
+    /* ← 好きな数値に調整  */
+}
+
+/* 2列目だけ左に広い余白をつけて距離を空ける */
+.attendance-list__th:nth-child(2),
+.attendance-list__td:nth-child(2) {
+    padding-left: 5px;
+    /* ← 好きな数値に調整 */
+}
+
+/* 2〜6列目は右寄せ */
+.attendance-list__th:nth-child(n+2),
+.attendance-list__td:nth-child(n+2) {
+    text-align: right;
+    padding-right: 20px;
+    /* 好みで調整 */
+}
+
+.attendance-list__month-nav a.attendance-list__next,
+.attendance-list__month-nav a.attendance-list__prev {
+    color: #737373;
+}
+
+.attendance-list__td {
+    color: #797979;
+}
+
+.attendance-list__detail-link {
+    color: #000;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.attendance-list__nav-center {
+    display: flex;
+    align-items: center;
+    /* ← これで縦位置が完全に中央揃え */
+    gap: 8px;
+    color: #000;
+    font-weight: bold;
+}
+
+.attendance-list__icon {
+    width: 26px;
+    height: 26px;
+    fill: #555;
+}
+
+.detail-btn {
+    text-decoration: none;
+    color: #000;
+    font-weight: bold;
+}

@@ -1,0 +1,74 @@
+.index {
+    max-width: 800px;
+    margin: 0 auto;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.index__status {
+    margin-top: 160px;
+}
+
+.index__status-label {
+    background-color: #c8c8c8;
+    padding: 5px 10px;
+    border-radius: 30px;
+    color: #7c7c7c;
+    margin-bottom: 5px;
+}
+
+.index__date {
+    margin: 20px;
+    font-size: 22px;
+}
+
+.index__time {
+    font-size: 45px;
+    margin-top: 5px;
+    font-weight: bold;
+}
+
+.index__button-start {
+    font-size: 16px;
+    padding: 10px 47px;
+    color: #fff;
+    background-color: #000;
+    border-radius: 15px;
+    border: 1px solid #000;
+    font-weight: bold;
+    margin: 50px;
+}
+
+.index__button {
+    font-size: 16px;
+    border-radius: 15px;
+    margin: 50px;
+}
+
+.index__buttons {
+    display: flex;
+    flex-direction: row;
+}
+
+.index__button--black {
+    padding: 10px 47px;
+    color: #fff;
+    background-color: #000;
+    border: 1px solid #000;
+    font-weight: bold;
+    margin-right: 0;
+}
+
+.index__button--white {
+    color: #000;
+    background-color: #fff;
+    padding: 10px 37px;
+    border: 1px solid #fff;
+    font-weight: bold;
+}
+
+.index__message {
+    font-weight: bold;
+    margin-top: 60px;
+}

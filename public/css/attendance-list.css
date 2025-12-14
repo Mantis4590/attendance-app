@@ -1,0 +1,93 @@
+.attendance-list {
+        max-width: 800px;
+        margin: 0 auto;
+        align-items: left;
+        display: flex;
+        flex-direction: column;
+}
+
+.attendance-list__title {
+    font-size: 22px;
+    font-weight: bold;
+    border-left: 6px solid #000;
+    padding: 2px 15px;
+    margin-top: 65px;
+}
+
+.attendance-list__month-nav {
+    display: flex;
+    flex-direction: row;
+    background-color: #fff;
+    border: 1px solid #fff;
+    border-radius: 6px;
+    padding: 10px 20px;
+    justify-content: space-between;
+    margin: 40px 0;
+    color: #737373;
+    text-decoration: none;
+}
+
+.attendance-list__prev,
+.attendance-list__next {
+    text-decoration: none;
+}
+
+.attendance-list__table {
+    background-color: #fff;
+    padding: 10px 20px;
+    align-items: left;
+    width: 100%;
+}
+
+.t__head-th {
+    text-align: left;
+    color: #737373;
+}
+
+.attendance-list__month-nav a.attendance-list__next,
+.attendance-list__month-nav a.attendance-list__prev {
+    color: #737373;
+}
+
+.attendance-list__current-month {
+    display: flex;
+    align-items: center;
+    /* ← これで縦位置が完全に中央揃え */
+    gap: 8px;
+    color: #000;
+    font-weight: bold;
+}
+
+.attendance-list__icon {
+    width: 26px;
+    height: 26px;
+    fill: #555;
+}
+
+.detail-btn {
+    text-decoration: none;
+    color: #000;
+    font-weight: bold;
+}
+
+.t__head-tr {
+    border-bottom: 3px solid #e1e1e1;
+}
+
+.t__body-td {
+    color: #737373;
+    padding-left: 0px;
+    border-bottom: 2px solid #e7e7e7;
+}
+
+.t__head th,
+.t__body td {
+    padding: 12px 24px;
+    /* 左右同じ値にするのがポイント */
+    text-align: center;
+    /* 全部中央揃えでOKならこれ */
+}
+
+.t__body tr:last-child td {
+    border-bottom: none;
+}
