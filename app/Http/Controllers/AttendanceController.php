@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Attendance;
 use Carbon\Carbon;
 use App\Http\Requests\AttendanceUpdateRequest;
+use App\Models\StampCorrectionRequest;
 
 class AttendanceController extends Controller
 {
@@ -177,30 +178,43 @@ class AttendanceController extends Controller
     }
 
 
-    public function list(Request $request) {
-        // 表示する月を取得
+    public function list(Request $request)
+    {
         $targetMonth = $request->query('month')
             ? Carbon::parse($request->query('month') . '-01')
             : Carbon::now()->startOfMonth();
 
-        // 前月・翌月計算
         $prevMonth = $targetMonth->copy()->subMonth()->format('Y-m');
         $nextMonth = $targetMonth->copy()->addMonth()->format('Y-m');
 
-        // ログインユーザーの指定月の勤怠を取得
+        // その月の勤怠を取得（date をキーにする）
         $attendances = Attendance::where('user_id', auth()->id())
-            ->whereDate('date', '>=', $targetMonth->copy()->startOfMonth())
-            ->whereDate('date', '<=', $targetMonth->copy()->endOfMonth())
-            ->orderBy('date', 'asc')
-            ->get();
+            ->whereBetween('date', [
+                $targetMonth->copy()->startOfMonth(),
+                $targetMonth->copy()->endOfMonth(),
+            ])
+            ->get()
+            ->keyBy(fn ($a) => $a->date->format('Y-m-d'));
+
+        // 月の日付一覧を作る
+        $dates = [];
+        $day = $targetMonth->copy()->startOfMonth();
+        $end = $targetMonth->copy()->endOfMonth();
+
+        while ($day <= $end) {
+            $dates[] = $day->copy();
+            $day->addDay();
+        }
 
         return view('attendance.list', compact(
+            'dates',
             'attendances',
             'targetMonth',
             'prevMonth',
             'nextMonth'
         ));
     }
+
 
     public function detail($id) {
         $attendance = Attendance::with('breakTimes')
@@ -211,7 +225,12 @@ class AttendanceController extends Controller
         // ユーザー情報（名前表示のため）
         $user = auth()->user();
 
-        return view('attendance.detail',compact('attendance', 'user'));
+        // この勤怠に対する承認待ち申請があるか
+        $hasPendingRequest = StampCorrectionRequest::where('attendance_id', $attendance->id)
+            ->where('status', 'pending')
+            ->exists();
+
+        return view('attendance.detail',compact('attendance', 'user', 'hasPendingRequest'));
     }
 
     public function update(AttendanceUpdateRequest $request, $id)
@@ -274,32 +293,37 @@ class AttendanceController extends Controller
         // 保存
         $attendance->save();
 
-        $attendance->update([
-            'status' => '承認待ち',
+        // ★ 修正申請を作成 ★
+        StampCorrectionRequest::create([
+            'user_id' => auth()->id(),
+            'attendance_id' => $attendance->id,
+            'reason' => $request->note, // 申請理由
+            'status' => 'pending',
         ]);
 
         return redirect()->route('attendance.detail', ['id' => $id])
-            ->with('success', '修正内容を保存しました');
+        ->with('success', '修正申請を送信しました');
+
     }
 
-    public function requestList(Request $request) {
-        $status = $request->query('status', 'pending');
+    public function requestList(Request $request)
+    {
+        $tab = $request->query('tab', 'pending');
 
-        if ($status === 'approved') {
-            // 承認済み
-            $requests = Attendance::where('user_id', auth()->id())
-                ->where('status', '承認済み')
-                ->orderBy('updated_at', 'desc')
-                ->get();
+        if ($tab === 'approved') {
+        $statusValue = 'approved';
         } else {
-            // 承認待ち
-            $requests = Attendance::where('user_id', auth()->id())
-                ->where('status', '承認待ち')
-                ->orderBy('updated_at', 'desc')
-                ->get();
+            $tab = 'pending';
+        $statusValue = 'pending';
         }
 
-        return view('request.list_request', compact('requests', 'status'));
+        $requests = StampCorrectionRequest::with('attendance')
+            ->where('user_id', auth()->id())
+            ->where('status', $statusValue)
+            ->orderByDesc('updated_at')
+            ->get();
+
+        return view('request.list_request', compact('requests', 'tab'));
     }
 
 }

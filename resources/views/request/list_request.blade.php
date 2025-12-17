@@ -10,9 +10,9 @@
 
     {{-- タブ --}}
     <div class="list-request__tabs">
-        <a href="{{ route('request.list', ['status' => 'pending']) }}" class="list-request__tab {{ $status === 'pending' ? 'list-request__tab--active' : '' }}">承認待ち</a>
+        <a href="{{ route('request.list', ['tab' => 'pending']) }}" class="list-request__tab {{ $tab === 'pending' ? 'list-request__tab--active' : '' }}">承認待ち</a>
 
-        <a href="{{ route('request.list', ['status' => 'approved']) }}" class="list-request__tab {{ $status === 'approved' ? 'list-request__tab--active' : '' }}">承認済み</a>
+        <a href="{{ route('request.list', ['tab' => 'approved']) }}" class="list-request__tab {{ $tab === 'approved' ? 'list-request__tab--active' : '' }}">承認済み</a>
     </div>
 
     {{-- テーブル --}}
@@ -32,13 +32,13 @@
                 
                 @forelse ($requests as $req)
                     <tr>
-                        <td class="t__body-td">{{ $req->status }}</td>
+                        <td class="t__body-td">{{ $req->status === 'pending' ? '承認待ち' : '承認済み' }}</td>
                         <td class="t__body-td">{{ auth()->user()->name }}</td>
-                        <td class="t__body-td">{{ $req->date->format('Y/m/d') }}</td>
-                        <td class="t__body-td">{{ $req->note }}</td>
+                        <td class="t__body-td">{{ optional($req->attendance)->date?->format('Y/m/d') ?? '-' }}</td>
+                        <td class="t__body-td">{{ $req->reason }}</td>
                         <td class="t__body-td">{{ $req->updated_at->format('Y/m/d') }}</td>
                         <td class="t__body-td">
-                            <a href="{{ route('attendance.detail', ['id' => $req->id]) }}" class="list-request__detail-link">詳細</a>
+                            <a href="{{ route('attendance.detail', ['id' => $req->attendance_id]) }}" class="list-request__detail-link">詳細</a>
                         </td>
                     </tr>
                 @empty

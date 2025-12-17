@@ -46,33 +46,43 @@
         </thead>
             
         <tbody>
-        @foreach($attendances as $attendance)
+        @foreach($dates as $date)
+            @php
+                $attendance = $attendances[$date->format('Y-m-d')] ?? null;
+                $weekMap = ['日','月','火','水','木','金','土'];
+            @endphp
+
             <tr>
-                @php
-                    $weekMap = ['Mon'=>'月','Tue'=>'火','Wed'=>'水','Thu'=>'木','Fri'=>'金','Sat'=>'土','Sun'=>'日'];
-                @endphp
-
+                {{-- 日付 --}}
                 <td class="t__body-td">
-                    {{ $attendance->date->format('m/d') }}
-                    ({{ $weekMap[$attendance->date->format('D')] }})
+                    {{ $date->format('m/d') }}
+                    ({{ $weekMap[$date->dayOfWeek] }})
                 </td>
 
+                @if ($attendance)
+                    {{-- 出勤 --}}
+                    <td class="t__body-td">{{ optional($attendance->clock_in)->format('H:i') ?? '-' }}</td>
 
-                {{-- 出勤 --}}
-                <td class="t__body-td">{{ optional($attendance->clock_in)->format('H:i') ?? '-' }}</td>
+                    {{-- 退勤 --}}
+                    <td class="t__body-td">{{ optional($attendance->clock_out)->format('H:i') ?? '-' }}</td>
 
-                {{-- 退勤 --}}
-                <td class="t__body-td">{{ optional($attendance->clock_out)->format('H:i') ?? '-' }}</td>
+                    {{-- 休憩（合計） --}}
+                    <td class="t__body-td">{{ $attendance->total_break ? substr($attendance->total_break, 0, 5) : '-' }}</td>
 
-                {{-- 休憩（合計） --}}
-                <td class="t__body-td">{{ $attendance->total_break ? substr($attendance->total_break, 0, 5) : '-' }}</td>
+                    {{-- 合計（勤務時間） --}}
+                    <td class="t__body-td">{{ $attendance->total_work ? substr($attendance->total_work, 0, 5) : '-' }}</td>
 
-                {{-- 合計（勤務時間） --}}
-                <td class="t__body-td">{{ $attendance->total_work ? substr($attendance->total_work, 0, 5) : '-' }}</td>
-
-                <td>
-                    <a href="{{ route('attendance.detail', ['id' => $attendance->id]) }}" class="detail-btn">詳細</a>
-                </td>
+                    <td>
+                        <a href="{{ route('attendance.detail', ['id' => $attendance->id]) }}" class="detail-btn">詳細</a>
+                    </td>
+                @else
+                    {{-- 未登録 --}}
+                    <td class="t__body-td">-</td>
+                    <td class="t__body-td">-</td>
+                    <td class="t__body-td">-</td>
+                    <td class="t__body-td">-</td>
+                    <td class="t__body-td text-muted">未登録</td>
+                @endif
             </tr>
         @endforeach
         </tbody>

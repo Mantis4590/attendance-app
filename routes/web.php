@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\AdminAttendanceController;
 use App\Http\Controllers\AdminStaffController;
+use App\Http\Controllers\AdminStampCorrectionRequestController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -51,6 +52,8 @@ Route::post('/admin/login', [AdminAuthController::class, 'loginStore'])
 Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::get('/attendance/list', [AdminAttendanceController::class, 'index'])
         ->name('admin.attendance.list');
+    Route::get('/stamp_correction_request/list', [AdminStampCorrectionRequestController::class, 'index'])
+        ->name('admin.stamp_correction_request.list');
 });
 
 Route::post('/admin/logout', function () {

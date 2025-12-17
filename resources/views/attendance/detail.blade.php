@@ -93,7 +93,7 @@
         {{-- 修正ボタン or メッセージ --}}
         <div class="attendance-detail__footer">
 
-            @if($attendance->status === '承認待ち')
+            @if($hasPendingRequest)
                 <p class="attendance-detail__note">＊承認待ちのため修正はできません。</p>
             @else
                 <button type="submit" class="attendance-detail__button">修正</button>

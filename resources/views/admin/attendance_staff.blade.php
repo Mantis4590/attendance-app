@@ -31,26 +31,33 @@
             </tr>
         </thead>
         <tbody>
-            @forelse ($days as $day)
-                <tr>
-                    <td class="staff-td">{{ $day['date']->format('m/d(D)') }}</td>
-                    <td class="staff-td">{{ optional($day['attendance']?->clock_in)->format('H:i') }}</td>
-                    <td class="staff-td">{{ optional($day['attendance']?->clock_out)->format('H:i') }}</td>
+        @foreach ($days as $day)
+            @php
+                $attendance = $day['attendance'];
+            @endphp
+
+            <tr>
+                {{-- 日付 --}}
+                <td class="staff-td">{{ $day['date']->format('m/d(D)') }}</td>
+
+                @if ($attendance)
+                    <td class="staff-td">{{ optional($attendance->clock_in)->format('H:i') ?? '-' }}</td>
+                    <td class="staff-td">{{ optional($attendance->clock_out)->format('H:i') ?? '-' }}</td>
+                    <td class="staff-td">{{ $attendance->total_break_display ?? '-' }}</td>
+                    <td class="staff-td">{{ $attendance->total_work_display ?? '-' }}</td>
                     <td class="staff-td">
-                    {{ $day['attendance']->total_break_display ?? '' }}
+                        <a href="{{ route('admin.attendance.show', $attendance->id) }}">詳細</a>
                     </td>
-                    <td class="staff-td">{{ $day['attendance']->total_work_display ?? '' }}</td>
-                    <td class="staff-td">
-                        @if ($day['attendance'])
-                            <a href="{{ route('admin.attendance.show', $day['attendance']->id) }}">詳細</a>
-                        @endif
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="6">勤怠データがありません</td>
-                </tr>
-            @endforelse
+                @else
+                    {{-- 未登録日 --}}
+                    <td class="staff-td">-</td>
+                    <td class="staff-td">-</td>
+                    <td class="staff-td">-</td>
+                    <td class="staff-td">-</td>
+                    <td class="staff-td text-muted">未登録</td>
+                @endif
+            </tr>
+        @endforeach
         </tbody>
     </table>
 
