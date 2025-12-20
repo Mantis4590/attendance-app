@@ -35,7 +35,7 @@
                         <td class="t__body-td">{{ $req->status === 'pending' ? '承認待ち' : '承認済み' }}</td>
                         <td class="t__body-td">{{ auth()->user()->name }}</td>
                         <td class="t__body-td">{{ optional($req->attendance)->date?->format('Y/m/d') ?? '-' }}</td>
-                        <td class="t__body-td">{{ $req->reason }}</td>
+                        <td class="t__body-td">{{ $req->note }}</td>
                         <td class="t__body-td">{{ $req->updated_at->format('Y/m/d') }}</td>
                         <td class="t__body-td">
                             <a href="{{ route('attendance.detail', ['id' => $req->attendance_id]) }}" class="list-request__detail-link">詳細</a>

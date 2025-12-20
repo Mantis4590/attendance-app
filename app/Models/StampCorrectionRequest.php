@@ -12,8 +12,19 @@ class StampCorrectionRequest extends Model
     protected $fillable = [
         'user_id',
         'attendance_id',
-        'reason',
+
+        // 修正内容
+        'clock_in',
+        'clock_out',
+        'breaks',
+        'note',
+
+        // 申請情報
         'status',
+    ];
+
+    protected $casts = [
+        'breaks' => 'array',
     ];
 
     public function user() {

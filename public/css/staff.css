@@ -1,0 +1,103 @@
+.staff {
+    max-width: 800px;
+    margin: 0 auto;
+    align-items: left;
+    display: flex;
+    flex-direction: column;
+}
+
+.staff-title {
+    font-size: 22px;
+    font-weight: bold;
+    border-left: 6px solid #000;
+    padding: 2px 15px;
+    margin-top: 75px;
+    margin-bottom: 75px;
+}
+
+.staff-table {
+    background-color: #fff;
+    padding: 10px 20px;
+    align-items: left;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.staff-th {
+    text-align: left;
+    color: #737373;
+    border-bottom: none;
+}
+
+.detail-btn {
+    text-decoration: none;
+    color: #000;
+    font-weight: bold;
+}
+
+.t__head-tr {
+    border-bottom: 3px solid #e1e1e1;
+}
+
+.staff-td {
+    color: #737373;
+    padding-left: 0px;
+    border-bottom: 2px solid #e7e7e7;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+.staff th,
+.staff td {
+    padding: 12px 24px;
+    /* 左右同じ値にするのがポイント */
+}
+
+.t__head tr:last-child td {
+    border-bottom: none;
+}
+
+.t__head-tr {
+    text-align: center;
+}
+
+.t__head {
+    position: relative;
+}
+
+.t__head::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 3px;
+    background-color: #e1e1e1;
+}
+
+.t__head-th:first-child {
+    text-align: left;
+    padding-left: 26px;
+}
+
+/* 列幅をCSSで制御する */
+.staff-th:nth-child(1),
+.staff-td:nth-child(1) {
+    width: 35%;
+    text-align: center;
+    /* 名前 */
+}
+
+.staff-th:nth-child(2),
+.staff-td:nth-child(2) {
+    width: 25%;
+    text-align: center;
+    /* メールはど真ん中 */
+}
+
+.staff-th:nth-child(3),
+.staff-td:nth-child(3) {
+    width: 40%;
+    text-align: center;
+    /* 月次勤怠 */
+}

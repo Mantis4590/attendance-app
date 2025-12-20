@@ -24,6 +24,8 @@
 
 .list-request__tab {
     margin-left: 50px;
+    text-decoration: none;
+    color: #000;
 }
 
 .t__head-tr {
@@ -44,9 +46,7 @@
 .t__head th,
 .t__body td {
     padding: 12px 24px;
-    /* 左右同じ値にするのがポイント */
-    text-align: center;
-    /* 全部中央揃えでOKならこれ */
+    text-align: left;
 }
 
 .t__body tr:last-child td {
@@ -60,11 +60,7 @@
     border: none;
     border-radius: 8px;
     border-collapse: collapse;
-}
-
-.list-request__tab {
-    text-decoration: none;
-    color: #000;
+    table-layout: fixed;
 }
 
 .list-request__tab--active {
@@ -76,4 +72,46 @@
     text-decoration: none;
     font-weight: bold;
     color: #000;
+}
+
+/* 日付列 */
+.t__head-th:nth-child(1),
+.t__body-td:nth-child(1) {
+    width: 16%;
+    padding-left: 32px;
+}
+
+.t__body-td:nth-child(1) {
+    text-align: center;
+}
+
+.t__head-th:nth-child(2),
+.t__body-td:nth-child(2) {
+    width: 16%;
+    padding-left: 32px;
+}
+
+.t__head-th:nth-child(3),
+.t__body-td:nth-child(3) {
+    width: 18%;
+    padding-left: 32px;
+}
+
+.t__head-th:nth-child(4),
+.t__body-td:nth-child(4) {
+    width: 22%;
+    padding-left: 32px;
+}
+
+.t__head-th:nth-child(5),
+.t__body-td:nth-child(5) {
+    width: 20%;
+    padding-left: 32px;
+}
+
+.t__head-th:nth-child(6),
+.t__body-td:nth-child(6) {
+    width: 10%;
+    text-align: center;
+    padding-left: 0;
 }

@@ -37,11 +37,13 @@
     padding: 10px 20px;
     align-items: left;
     width: 100%;
+    border-collapse: collapse;
 }
 
 .t__head-th {
     text-align: left;
     color: #737373;
+    border-bottom: none;
 }
 
 .attendance-list__month-nav a.attendance-list__next,
@@ -78,6 +80,8 @@
     color: #737373;
     padding-left: 0px;
     border-bottom: 2px solid #e7e7e7;
+    padding-top: 6px;
+    padding-bottom: 6px;
 }
 
 .t__head th,
@@ -90,4 +94,27 @@
 
 .t__body tr:last-child td {
     border-bottom: none;
+}
+
+.t__body-tr {
+    text-align: center;
+}
+
+.t__head {
+    position: relative;
+}
+
+.t__head::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 3px;
+    background-color: #e1e1e1;
+}
+
+.t__head-th:first-child {
+    text-align: left;
+    padding-left: 26px;
 }

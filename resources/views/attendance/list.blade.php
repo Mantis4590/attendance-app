@@ -52,7 +52,7 @@
                 $weekMap = ['日','月','火','水','木','金','土'];
             @endphp
 
-            <tr>
+            <tr class="t__body-tr">
                 {{-- 日付 --}}
                 <td class="t__body-td">
                     {{ $date->format('m/d') }}
@@ -72,16 +72,16 @@
                     {{-- 合計（勤務時間） --}}
                     <td class="t__body-td">{{ $attendance->total_work ? substr($attendance->total_work, 0, 5) : '-' }}</td>
 
-                    <td>
+                    <td class="t__body-td">
                         <a href="{{ route('attendance.detail', ['id' => $attendance->id]) }}" class="detail-btn">詳細</a>
                     </td>
                 @else
                     {{-- 未登録 --}}
-                    <td class="t__body-td">-</td>
-                    <td class="t__body-td">-</td>
-                    <td class="t__body-td">-</td>
-                    <td class="t__body-td">-</td>
-                    <td class="t__body-td text-muted">未登録</td>
+                    <td class="t__body-td"></td>
+                    <td class="t__body-td"></td>
+                    <td class="t__body-td"></td>
+                    <td class="t__body-td"></td>
+                    <td class="t__body-td text-muted"></td>
                 @endif
             </tr>
         @endforeach

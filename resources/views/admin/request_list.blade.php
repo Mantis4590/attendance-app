@@ -33,20 +33,20 @@
 
         <tbody class="t__body">
             @forelse($requests as $req)
-                <tr class="t__head-tr">
+                <tr class="t__body-tr">
                     <td class="request-list__td">{{ $req->status === 'pending' ? '承認待ち' : '承認済み' }} </td>
                     <td class="request-list__td">{{ $req->user->name ?? '-' }}</td>
                     <td class="request-list__td">{{ optional(optional($req->attendance)->date)->format('Y/m/d') ?? '-' }}
                     </td>
-                    <td class="request-list__td">{{ $req->reason ?? '-' }}</td>
+                    <td class="request-list__td">{{ $req->note ?? '-' }}</td>
                     <td class="request-list__td">{{ optional($req->created_at)->format('Y/m/d') ?? '-' }}</td>
                     <td class="request-list__td request-list__td--link">
-                        <a href="#" class="request-list__link">詳細</a>
+                        <a href="{{ route('admin.stamp_correction_request.show', $req) }}" class="request-list__link">詳細</a>
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td class="request-list__empty" colspan="6">申請はありません</td>
+                    <td class="request-list__empty" colspan="6"></td>
                 </tr>
             @endforelse
         </tbody>

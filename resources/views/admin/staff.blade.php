@@ -12,7 +12,7 @@
 
      <table class="staff-table">
         <thead class="t__head">
-            <tr>
+            <tr class="t__head-tr">
                 <th class="staff-th">名前</th>
                 <th class="staff-th">メールアドレス</th>
                 <th class="staff-th">月次勤怠</th>
@@ -24,7 +24,7 @@
                     <td class="staff-td">{{ $user->name }}</td>
                     <td class="staff-td">{{ $user->email }}</td>
                     <td class="staff-td">
-                        <a href="{{ route('admin.attendance.staff', ['id' => $user->id]) }}">詳細</a>
+                        <a href="{{ route('admin.attendance.staff', ['id' => $user->id]) }}" class="detail-btn">詳細</a>
                     </td>
                 </tr>
             @endforeach

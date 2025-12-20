@@ -9,7 +9,7 @@
     <div class="attendance-detail__title">勤怠詳細</div>
 
     {{-- 修正フォーム --}}
-    <form action="{{ route('attendance.update', ['id' => $attendance->id]) }}" method="POST">
+    <form action="{{ route('attendance.request', $attendance->id) }}" method="POST">
         @csrf
 
         <div class="attendance-detail__box">
@@ -95,6 +95,8 @@
 
             @if($hasPendingRequest)
                 <p class="attendance-detail__note">＊承認待ちのため修正はできません。</p>
+            @elseif ($hasApprovedRequest)
+                <p class="attendance-detail__note">※ 承認済みの勤怠は修正できません</p>
             @else
                 <button type="submit" class="attendance-detail__button">修正</button>
             @endif
