@@ -226,85 +226,42 @@ class AttendanceController extends Controller
         $user = auth()->user();
 
         // この勤怠に対する承認待ち申請があるか
-        $hasPendingRequest = StampCorrectionRequest::where('attendance_id', $attendance->id)
+        $pendingRequest = StampCorrectionRequest::where('attendance_id', $attendance->id)
             ->where('status', 'pending')
+            ->first();
+
+        $hasPendingRequest = $pendingRequest !== null;
+
+        $hasApprovedRequest = StampCorrectionRequest::where('attendance_id', $attendance->id)
+            ->where('status', 'approved')
             ->exists();
 
-        return view('attendance.detail',compact('attendance', 'user', 'hasPendingRequest'));
+        return view('attendance.detail',compact('attendance', 'user', 'hasPendingRequest',
+        'hasApprovedRequest',
+        'pendingRequest'
+        ));
     }
 
     public function update(AttendanceUpdateRequest $request, $id)
     {
-        $attendance = Attendance::with('breakTimes')->findOrFail($id);
+        $attendance = Attendance::findOrFail($id);
 
-        // 出勤・退勤の更新
-        $attendance->clock_in  = $request->clock_in ? Carbon::parse($request->clock_in) : null;
-        $attendance->clock_out = $request->clock_out ? Carbon::parse($request->clock_out) : null;
-
-        // 既存の休憩時間を更新
-        foreach ($attendance->breakTimes as $index => $break) {
-
-            if (isset($request->breaks[$index])) {
-                $start = $request->breaks[$index]['start'] ?? null;
-                $end   = $request->breaks[$index]['end'] ?? null;
-
-                $break->break_start = $start ? Carbon::parse($start) : null;
-                $break->break_end   = $end   ? Carbon::parse($end)   : null;
-                $break->save();
-            }
-        }
-
-        // 新しい休憩行があれば追加
-        if (!empty($request->breaks['new']['start']) || !empty($request->breaks['new']['end'])) {
-            $attendance->breakTimes()->create([
-                'break_start' => $request->breaks['new']['start'] ? Carbon::parse($request->breaks['new']['start']) : null,
-                'break_end'   => $request->breaks['new']['end']   ? Carbon::parse($request->breaks['new']['end'])   : null,
-            ]);
-        }
-
-        // 備考の更新
-        $attendance->note = $request->note;
-
-        // 休憩合計を再計算
-        $attendance->load('breakTimes');
-
-        $totalBreakMinutes = $attendance->breakTimes
-            ->filter(fn($b) => $b->break_start && $b->break_end)
-            ->sum(fn($b) => $b->break_start->diffInMinutes($b->break_end));
-
-        $attendance->total_break = sprintf('%02d:%02d',
-            intdiv($totalBreakMinutes, 60),
-            $totalBreakMinutes % 60
+        StampCorrectionRequest::updateOrcreate([
+                'attendance_id' => $attendance->id,
+                'status' => 'pending',
+            ],
+            [
+                'user_id' => auth()->id(),
+                'clock_in' => $request->clock_in,
+                'clock_out' => $request->clock_out,
+                'breaks' => $request->breaks,
+                'note' => $request->note,
+            ]
         );
 
-        // 勤務時間も再計算
-        if ($attendance->clock_in && $attendance->clock_out) {
-            $workMinutes = $attendance->clock_in->diffInMinutes($attendance->clock_out)
-            - $totalBreakMinutes;
-
-            if ($workMinutes < 0) $workMinutes = 0;
-
-            $attendance->total_work = sprintf('%02d:%02d',
-            intdiv($workMinutes, 60),
-            $workMinutes % 60
-            );
-        }
-
-        // 保存
-        $attendance->save();
-
-        // ★ 修正申請を作成 ★
-        StampCorrectionRequest::create([
-            'user_id' => auth()->id(),
-            'attendance_id' => $attendance->id,
-            'reason' => $request->note, // 申請理由
-            'status' => 'pending',
-        ]);
-
-        return redirect()->route('attendance.detail', ['id' => $id])
-        ->with('success', '修正申請を送信しました');
-
+        return back()->with('message', '修正申請を送信しました');
     }
+
 
     public function requestList(Request $request)
     {
@@ -324,6 +281,24 @@ class AttendanceController extends Controller
             ->get();
 
         return view('request.list_request', compact('requests', 'tab'));
+    }
+
+    public function store(Request $request, Attendance $attendance) {
+        // ★ 修正申請を作成 ★
+        StampCorrectionRequest::create([
+            'user_id' => auth()->id(),
+            'attendance_id' => $attendance->id,
+
+            // 修正内容
+            'clock_in' => $request->clock_in,
+            'clock_out' => $request->clock_out,
+            'breaks' => $request->breaks,
+            'note' => $request->note,
+            // 申請理由
+            'status' => 'pending',
+        ]);
+
+        return back()->with('message', '修正申請を送信しました');
     }
 
 }
