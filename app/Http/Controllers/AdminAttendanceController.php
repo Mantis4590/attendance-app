@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use App\Models\Attendance;
 use App\Http\Requests\AdminAttendanceUpdateRequest;
 use App\Models\User;
+use App\Models\StampCorrectionRequest;
 
 class AdminAttendanceController extends Controller
 {
@@ -37,33 +38,75 @@ class AdminAttendanceController extends Controller
     public function show($id) {
         $attendance = Attendance::with(['user', 'breakTimes'])->findOrFail($id);
 
+        // 承認待ちの修正申請があるか
+        $hasPendingRequest = StampCorrectionRequest::where('attendance_id', $attendance->id)
+            ->where('status', 'pending')
+            ->exists();
+
         return view('admin.attendance_show', [
             'attendance' => $attendance,
+            'hasPendingRequest' => $hasPendingRequest,
         ]);
     }
 
     public function update(AdminAttendanceUpdateRequest $request, $id) {
         $attendance = Attendance::findOrFail($id);
 
-        // 保存処理
-        $attendance->clock_in = $request->clock_in;
-        $attendance->clock_out = $request->clock_out;
-        $attendance->break_start = $request->break_start;
-        $attendance->break_end = $request->break_end;
-        $attendance->note = $request->note;
+        // 出勤・退勤・備考
+        $attendance->update([
+            'clock_in' => $request->clock_in,
+            'clock_out' => $request->clock_out,
+            'note' => $request->note,
+        ]);
 
-        // 合計時間の再計算
-        $attendance->total_work = $this->calcWorkMinutes(
-            $attendance->clock_in,
-            $attendance->clock_out,
-            $attendance->break_start,
-            $attendance->break_end
+        // 既存の休憩を全削除
+        $attendance->breakTimes()->delete();
+
+        // 休憩を再作成
+        if ($request->filled('breaks')) {
+            foreach ($request->breaks as $break) {
+                if (
+                    !empty($break['start']) &&
+                    !empty($break['end'])
+                ) {
+                    $attendance->breakTimes()->create([
+                        'break_start' => $break['start'],
+                        'break_end' => $break['end'],
+                    ]);
+                }
+            }
+        }
+
+        // リレーションを再読み込み
+        $attendance->load('breakTimes');
+
+        // 休憩合計（分）を再計算
+        $totalBreakMinutes = $attendance->breakTimes
+            ->filter(fn ($breakTime) => $breakTime->break_start && $breakTime->break_end
+            )
+            ->sum(fn ($breakTime) => $breakTime->break_start->diffInMinutes($breakTime->break_end)
+            );
+
+        $attendance->total_break = sprintf(
+            '%02d:%02d',
+            intdiv($totalBreakMinutes, 60),
+            $totalBreakMinutes % 60
         );
 
-        $attendance->total_break = $this->calcBreakMinutes(
-            $attendance->break_start,
-            $attendance->break_end
-        );
+        // 勤務時間の再計算
+        if ($attendance->clock_in && $attendance->clock_out) {
+            $workMinutes =
+                $attendance->clock_in->diffInMinutes($attendance->clock_out)
+                - $totalBreakMinutes;
+                
+            $workMinutes = max(0, $workMinutes);
+
+            $attendance->total_work = sprintf(
+                '%02d:%02d',
+                intdiv($workMinutes, 60),
+                $workMinutes % 60
+            );
+        }
 
         $attendance->save();
 
