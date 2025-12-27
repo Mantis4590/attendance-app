@@ -27,4 +27,10 @@
 
 ## URL
 ・開発環境：http://localhost/  
-・phpMyAdmin：http://localhost:8080/
+・phpMyAdmin：http://localhost:8080/  
+・一般ユーザー用会員登録画面：http://localhost/register  
+・管理者用ログイン画面：http://localhost/admin/login
+
+### 管理者ログイン情報
+・メールアドレス：admin@example.com  
+・パスワード：test1122
