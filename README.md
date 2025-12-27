@@ -2,7 +2,7 @@
 
 ## 環境構築
 
-### Docker環境ビルド
+### Dockerビルド
 1. git clone https://github.com/Mantis4590/attendance-app.git
 2. docker-compose up -d --build
 
