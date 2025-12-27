@@ -15,7 +15,7 @@
 6. php artisan db:seed
 
 ## 使用技術（実行環境）
-・PHP 8.x
+・PHP 8.x 
 ・Laravel 8.x
 ・MySQL 8.0
 ・Nginx 1.21
