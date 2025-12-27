@@ -15,16 +15,16 @@
 6. php artisan db:seed
 
 ## 使用技術（実行環境）
-・PHP 8.x 
-・Laravel 8.x
-・MySQL 8.0
-・Nginx 1.21
-・Docker / Docker Compose
+・PHP 8.x　
+・Laravel 8.x　
+・MySQL 8.0　
+・Nginx 1.21　
+・Docker / Docker Compose　
 ・MailHog（メール送信確認）
 
 ## ER図
 ![ER図](er.png)
 
 ## URL
-・開発環境：http://localhost/
+・開発環境：http://localhost/　
 ・phpMyAdmin：http://localhost:8080/
