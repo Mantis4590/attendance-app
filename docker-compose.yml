@@ -6,7 +6,6 @@ services:
     volumes:
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
       - ./:/var/www
-
     depends_on:
       - php
 
@@ -14,6 +13,9 @@ services:
     build: ./docker/php
     volumes:
       - ./:/var/www/
+    depends_on:
+      - mysql
+      - mailhog   # ← ここに mailhog
 
   mysql:
     image: mysql:8.0
@@ -38,4 +40,11 @@ services:
     depends_on:
       - mysql
     ports:
-      - 8080:80
+      - "8080:80"
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: attendance_mailhog
+    ports:
+      - "8025:8025"
+      - "1025:1025"

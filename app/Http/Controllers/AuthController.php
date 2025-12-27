@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\LoginRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Auth\Events\Registered;
 
 class AuthController extends Controller
 {
@@ -28,8 +29,11 @@ class AuthController extends Controller
         // 登録したユーザーでログインさせる
         Auth::login($user);
 
-        // 勤怠登録画面に遷移
-        return redirect()->route('attendance.index');
+        // 明示的に送信
+        $user->sendEmailVerificationNotification();
+
+        // 認証誘導画面へ
+        return redirect()->route('verification.notice');
     }
 
     public function loginStore(LoginRequest $request) {

@@ -13,9 +13,17 @@
     {{-- ロゴ --}}
     <div class="header__left">
         @auth
-            <a href="{{ route('attendance.index') }}">
-                <img src="{{ asset('images/COACHTECHヘッダーロゴ.png') }}" class="header__logo">
-            </a>
+            @if(auth()->user()->hasVerifiedEmail())
+                {{-- 認証済みユーザ- --}}
+                <a href="{{ route('attendance.index') }}">
+                    <img src="{{ asset('images/COACHTECHヘッダーロゴ.png') }}" class="header__logo">
+                </a>
+            @else
+                {{-- 未認証ユーザー --}}
+                <a href="{{ route('verification.notice') }}">
+                    <img src="{{ asset('images/COACHTECHヘッダーロゴ.png') }}" class="header__logo">
+                </a>
+            @endif
         @endauth
 
         @guest
@@ -27,20 +35,21 @@
 
     {{-- ナビ --}}
     @auth
-        <nav class="header__nav">
-            <a href="{{ route('attendance.index') }}" class="header__nav-item">勤怠</a>
-            <a href="{{ route('attendance.list') }}" class="header__nav-item">勤怠一覧</a>
-            <a href="{{ route('request.list') }}" class="header__nav-item">申請</a>
+        @if(auth()->user()->hasVerifiedEmail())
+            <nav class="header__nav">
+                <a href="{{ route('attendance.index') }}" class="header__nav-item">勤怠</a>
+                <a href="{{ route('attendance.list') }}" class="header__nav-item">勤怠一覧</a>
+                <a href="{{ route('request.list') }}" class="header__nav-item">申請</a>
 
-            <form action="{{ route('logout') }}" method="POST">
-                @csrf
-                <a href="#" class="header__nav-item"
-                onclick="event.preventDefault(); this.closest('form').submit();">
-                ログアウト
-                </a>
-            </form>
-
-        </nav>
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <a href="#" class="header__nav-item"
+                        onclick="event.preventDefault(); this.closest('form').submit();">
+                        ログアウト
+                    </a>
+                </form>
+            </nav>
+        @endif
     @endauth
 
     {{-- ゲストのときはナビを表示しない --}}

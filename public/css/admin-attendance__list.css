@@ -36,11 +36,17 @@
     background-color: #fff;
     padding: 10px 20px;
     align-items: left;
+    border-collapse: collapse;
+    border-radius: 6px;
+}
+
+.t__head-tr {
+    border-bottom: 3px solid #e1e1e1;
 }
 
 .attendance-list__th {
-    text-align: left;
     color: #737373;
+    padding: 10px 15px;
 }
 
 /* 1列目（名前）だけちょい右にする */
@@ -60,7 +66,6 @@
 /* 2〜6列目は右寄せ */
 .attendance-list__th:nth-child(n+2),
 .attendance-list__td:nth-child(n+2) {
-    text-align: right;
     padding-right: 20px;
     /* 好みで調整 */
 }
@@ -70,8 +75,19 @@
     color: #737373;
 }
 
+.t__body-tr {
+    border-bottom: 2px solid #e1e1e1;
+}
+
+.t__body-tr:last-child {
+    border-bottom: none;
+}
+
 .attendance-list__td {
     color: #797979;
+    padding: 10px 15px;
+    font-weight: bold;
+    text-align: center;
 }
 
 .attendance-list__detail-link {
@@ -99,4 +115,8 @@
     text-decoration: none;
     color: #000;
     font-weight: bold;
+}
+
+.attendance-list__empty {
+    text-align: center;
 }

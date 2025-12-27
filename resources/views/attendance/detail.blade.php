@@ -8,6 +8,38 @@
 <main class="attendance-detail">
     <div class="attendance-detail__title">勤怠詳細</div>
 
+    @php
+        use Carbon\Carbon;
+
+        // 出勤・退勤（これは完成済み）
+        $displayClockIn = $pendingRequest?->clock_in
+            ? Carbon::parse($pendingRequest->clock_in)
+            : $attendance->clock_in;
+
+        $displayClockOut = $pendingRequest?->clock_out
+            ? Carbon::parse($pendingRequest->clock_out)
+            : $attendance->clock_out;
+
+        $displayNote = $pendingRequest?->note ?? $attendance->note;
+
+        // ★ ここが今回の本丸 ★
+        if ($pendingRequest && is_array($pendingRequest->breaks)) {
+            // 申請中 → stamp_correction_requests の breaks を使う
+            $displayBreaks = collect($pendingRequest->breaks)
+                ->filter(fn ($b) => isset($b['start']) || isset($b['end']))
+                ->map(function ($b) {
+                    return (object) [
+                        'break_start' => isset($b['start']) ? Carbon::parse($b['start']) : null,
+                        'break_end'   => isset($b['end'])   ? Carbon::parse($b['end'])   : null,
+                    ];
+                });
+        } else {
+            // 通常時 → attendances の breakTimes
+            $displayBreaks = $attendance->breakTimes;
+        }
+    @endphp
+
+
     {{-- 修正フォーム --}}
     <form action="{{ route('attendance.request', $attendance->id) }}" method="POST">
         @csrf
@@ -33,9 +65,15 @@
             <div class="attendance-detail__row">
                 <div class="attendance-detail__label">出勤・退勤</div>
                 <div class="attendance-detail__value attendance-detail__value--time">
-                    <input type="text" name="clock_in" value="{{ old('clock_in', $attendance->clock_in?->format('H:i')) }}" class="time-input">
+                    <input type="text" name="clock_in"
+                    value="{{ old('clock_in', optional($displayClockIn)->format('H:i')) }}"
+                    class="time-input">
+
                     〜
-                    <input type="text" name="clock_out" value="{{ old('clock_out', $attendance->clock_out?->format('H:i')) }}" class="time-input">
+
+                    <input type="text" name="clock_out"
+                    value="{{ old('clock_out', optional($displayClockOut)->format('H:i')) }}"
+                    class="time-input">
                 </div>
             </div>
 
@@ -47,7 +85,8 @@
             @endif
 
             {{-- 休憩 --}}
-            @foreach ($attendance->breakTimes as $index => $break)
+            @foreach ($displayBreaks as $index => $break)
+
                 <div class="attendance-detail__row">
                     <div class="attendance-detail__label">休憩{{ $index + 1 }}</div>
                     <div class="attendance-detail__value attendance-detail__value--time">
@@ -80,7 +119,7 @@
             <div class="attendance-detail__row">
                 <div class="attendance-detail__label">備考</div>
                 <div class="attendance-detail__value">
-                    <textarea name="note" class="note-input">{{ old('note', $attendance->note) }}</textarea>
+                    <textarea name="note" class="note-input">{{ old('note', $displayNote) }}</textarea>
                 </div>
             </div>
 

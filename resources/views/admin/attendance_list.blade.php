@@ -37,7 +37,7 @@
     {{-- 勤怠テーブル --}}
     <table class="attendance-list__table">
         <thead class="t__head">
-            <tr>
+            <tr class="t__head-tr">
                 <th class="attendance-list__th">名前</th>
                 <th class="attendance-list__th">出勤</th>
                 <th class="attendance-list__th">退勤</th>
@@ -48,7 +48,7 @@
         </thead>
         <tbody>
             @forelse ($attendances as $attendance)
-                <tr>
+                <tr class="t__body-tr">
                     <td class="attendance-list__td">
                         {{ $attendance->user->name }}
                     </td>

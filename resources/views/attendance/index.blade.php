@@ -45,7 +45,7 @@
             @csrf
             <button class="index__button index__button--white">休憩戻</button>
         </form>
-    @elseif ($status === '退勤済み')
+    @elseif ($status === '退勤済')
         {{-- 退勤後 --}}
         <p class="index__message">お疲れ様でした。</p>
     @endif

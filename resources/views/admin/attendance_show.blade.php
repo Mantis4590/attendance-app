@@ -35,18 +35,22 @@
 
             {{-- 出勤・退勤 --}}
             <div class="attendance-show__row">
-                <div class="attendance-show__label">出勤</div>
+                <div class="attendance-show__label">出勤・退勤</div>
                 <div class="attendance-show__value attendance-show__value--time">
                     <input type="text" name="clock_in" value="{{ old('clock_in', $attendance->clock_in?->format('H:i')) }}" class="time-input">
                     〜
                     <input type="text" name="clock_out" value="{{ old('clock_out', $attendance->clock_out?->format('H:i')) }}" class="time-input">
-
-                    {{-- 出勤・退勤エラー --}}
-                    @error('clock_in')
-                        <p class="attendance-show__error">{{ $message }}</p>
-                    @enderror
                 </div>
             </div>
+            {{-- 出勤・退勤エラー --}}
+            @error('clock_in')
+                <p class="attendance-show__error">{{ $message }}</p>
+            @enderror
+
+            @error('clock_out')
+                <p class="attendance-show__error">{{ $message }}</p>
+            @enderror
+
 
             {{-- 既存の休憩 --}}
             @foreach ($attendance->breakTimes as $index => $break)
@@ -64,12 +68,7 @@
 
             {{-- 休憩エラー（まとめて1回） --}}
             @error('breaks')
-                <div class="attendance-show__row">
-                    <div class="attendance-show__label"></div>
-                    <div class="attendance-show__value">
-                        <p class="attendance-show__error">{{ $message }}</p>
-                    </div>
-                </div>
+                <p class="attendance-show__error">{{ $message }}</p>
             @enderror
 
             {{-- 追加用の空フィールド --}}
@@ -89,12 +88,11 @@
                 <div class="attendance-show__label">備考</div>
                 <div class="attendance-show__value">
                     <textarea name="note" class="note-input">{{ old('note', $attendance->note) }}</textarea>
-
-                    @error('note')
-                        <p class="attendance-show__error">{{ $message }}</p>
-                    @enderror
                 </div>
             </div>
+            @error('note')
+                <p class="attendance-show__error">{{ $message }}</p>
+            @enderror
 
             {{-- 修正ボタン --}}
             <div class="attendance-show__footer">

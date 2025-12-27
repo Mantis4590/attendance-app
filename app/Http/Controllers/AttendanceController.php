@@ -50,7 +50,7 @@ class AttendanceController extends Controller
             $latestBreak = $attendance->breakTimes()->latest()->first();
 
             if ($attendance->clock_out) {
-            $status = "退勤済み";
+            $status = "退勤済";
             } elseif ($latestBreak && is_null($latestBreak->break_end)) {
                 // break_end が null → 休憩中
                 $status = "休憩中";
@@ -246,18 +246,15 @@ class AttendanceController extends Controller
     {
         $attendance = Attendance::findOrFail($id);
 
-        StampCorrectionRequest::updateOrcreate([
-                'attendance_id' => $attendance->id,
-                'status' => 'pending',
-            ],
-            [
-                'user_id' => auth()->id(),
-                'clock_in' => $request->clock_in,
-                'clock_out' => $request->clock_out,
-                'breaks' => $request->breaks,
-                'note' => $request->note,
-            ]
-        );
+        StampCorrectionRequest::create([
+            'user_id' => auth()->id(),
+            'attendance_id' => $attendance->id,
+            'clock_in' => $request->clock_in,
+            'clock_out' => $request->clock_out,
+            'breaks' => $request->breaks,
+            'note' => $request->note,
+            'status' => 'pending',
+        ]);
 
         return back()->with('message', '修正申請を送信しました');
     }
@@ -283,18 +280,17 @@ class AttendanceController extends Controller
         return view('request.list_request', compact('requests', 'tab'));
     }
 
-    public function store(Request $request, Attendance $attendance) {
-        // ★ 修正申請を作成 ★
+    public function store(AttendanceUpdateRequest $request, $id)
+    {
+        $attendance = Attendance::findOrFail($id);
+
         StampCorrectionRequest::create([
             'user_id' => auth()->id(),
             'attendance_id' => $attendance->id,
-
-            // 修正内容
             'clock_in' => $request->clock_in,
             'clock_out' => $request->clock_out,
             'breaks' => $request->breaks,
             'note' => $request->note,
-            // 申請理由
             'status' => 'pending',
         ]);
 

@@ -8,6 +8,7 @@ use App\Models\Attendance;
 use App\Http\Requests\AdminAttendanceUpdateRequest;
 use App\Models\User;
 use App\Models\StampCorrectionRequest;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AdminAttendanceController extends Controller
 {
@@ -181,5 +182,75 @@ class AdminAttendanceController extends Controller
             'month' => $month,
             'days' => $days,
         ]);
+    }
+
+    public function csv(Request $request, $id) {
+        $staff = User::findOrFail($id);
+
+        // 対象月
+        $month = $request->query('month')
+            ? Carbon::parse($request->query('month'))
+            : Carbon::now();
+
+        $startOfMonth = $month->copy()->startOfMonth();
+        $endOfMonth = $month->copy()->endOfMonth();
+
+        $attendances = Attendance::where('user_id', $staff->id)
+            ->whereBetween('date', [$startOfMonth, $endOfMonth])
+            ->orderBy('date')
+            ->get()
+            ->KeyBy(fn ($attendance) => $attendance->date->format('Y-m-d'));
+
+        $response = new StreamedResponse(function () use (
+            $staff,
+            $month,
+            $attendances,
+            $startOfMonth,
+            $endOfMonth
+        ) {
+            $handle = fopen('php://output', 'w');
+
+            fwrite($handle, "\xEF\xBB\xBF");
+
+            // CSVヘッダ
+            fputcsv($handle, [
+                '日付',
+                '出勤',
+                '退勤',
+                '休憩',
+                '勤務時間',
+            ]);
+
+            $current = $startOfMonth->copy();
+
+            while ($current <= $endOfMonth) {
+                $key = $current->format('Y-m-d');
+                $attendance = $attendances->get($key);
+
+                fputcsv($handle, [
+                    $current->format('Y-m-d'),
+                    $attendance?->clock_in?->format('H:i') ?? '',
+                    $attendance?->clock_out?->format('H:i') ?? '',
+                    $attendance->total_break_display ?? '',
+                    $attendance->total_work_display ?? '',
+                ]);
+
+                $current->addDay();
+            }
+        });
+
+        $fileName = sprintf(
+            '%s_%s_attendance.csv',
+            $staff->name,
+            $month->format('Y_m')
+        );
+
+        $response->headers->set('Content-Type', 'text/csv; charset=UTF-8');
+        $response->headers->set(
+            'Content-Disposition',
+            "attachment; filename=\"{$fileName}\""
+        );
+
+        return $response;
     }
 }
