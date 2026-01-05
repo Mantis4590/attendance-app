@@ -40,3 +40,8 @@
     border: none;
     font-size: 15px;
 }
+
+.success {
+    text-align: center;
+    color: #ff0000;
+}

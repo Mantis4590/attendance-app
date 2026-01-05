@@ -30,7 +30,9 @@ class AttendanceCorrectionTest extends TestCase
             ]
         );
 
-        $response->assertSessionHasErrors(['clock_out']);
+        $response->assertSessionHasErrors([
+            'clock_out' => '出勤時間もしくは退勤時間が不適切な値です',
+        ]);
 
     }
 
@@ -48,15 +50,17 @@ class AttendanceCorrectionTest extends TestCase
                 'clock_in' => '09:00',
                 'clock_out' => '18:00',
                 'breaks' => [
-                    ['start' => '19:00', 'end' => '19:30']
+                    ['start' => '19:00', 'end' => '19:30'],
                 ],
                 'note' => 'テスト',
             ]
         );
 
-        $response->assertSessionHasErrors(['breaks.0.end']);
-
+        $response->assertSessionHasErrors([
+            'breaks.0.start' => '休憩時間が不適切な値です',
+        ]);
     }
+
 
     /** @test */
     public function 休憩終了時間が退勤時間より後になっている場合、エラーメッセージが表示される()
@@ -78,7 +82,9 @@ class AttendanceCorrectionTest extends TestCase
             ]
         );
 
-        $response->assertSessionHasErrors(['breaks.0.end']);
+        $response->assertSessionHasErrors([
+            'breaks.0.end' => '休憩時間もしくは退勤時間が不適切な値です',
+        ]);
     }
 
     /** @test */
@@ -98,7 +104,9 @@ class AttendanceCorrectionTest extends TestCase
             ]
         );
 
-        $response->assertSessionHasErrors(['note']);
+        $response->assertSessionHasErrors([
+            'note' => '備考を記入してください',
+        ]);
     }
 
     /** @test */

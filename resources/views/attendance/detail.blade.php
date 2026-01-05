@@ -114,6 +114,11 @@
                 <input type="text" name="breaks[new][end]" value="{{ old('breaks.new.end') }}" class="time-input">
                 </div>
             </div>
+            @if ($errors->has('breaks.new.start') || $errors->has('breaks.new.end'))
+                <p class="input-error">
+                    {{ $errors->first('breaks.new.start') ?: $errors->first('breaks.new.end') }}
+                </p>
+            @endif
 
             {{-- 備考 --}}
             <div class="attendance-detail__row">

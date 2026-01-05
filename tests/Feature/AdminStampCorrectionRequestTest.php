@@ -55,7 +55,7 @@ class AdminStampCorrectionRequestTest extends TestCase
         ]);
 
         $response = $this->get(
-            route('admin.stamp_correction_request.list', ['status' => 'approved'])
+            route('admin.stamp_correction_request.list', ['tab' => 'approved'])
         );
 
         $response->assertStatus(200);

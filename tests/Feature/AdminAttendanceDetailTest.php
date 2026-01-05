@@ -72,7 +72,9 @@ class AdminAttendanceDetailTest extends TestCase
             ]
         );
 
-        $response->assertSessionHasErrors(['clock_in']);
+        $response->assertSessionHasErrors([
+            'clock_in' => '出勤時間もしくは退勤時間が不適切な値です',
+        ]);
     }
 
 
@@ -93,7 +95,9 @@ class AdminAttendanceDetailTest extends TestCase
             ]
         );
 
-        $response->assertSessionHasErrors(['breaks']);
+        $response->assertSessionHasErrors([
+            'breaks' => '休憩時間が不適切な値です',
+        ]);
     }
 
     /** @test */
@@ -123,7 +127,9 @@ class AdminAttendanceDetailTest extends TestCase
         );
 
         // 検証（文言は見ない）
-        $response->assertSessionHasErrors(['breaks']);
+        $response->assertSessionHasErrors([
+            'breaks' => '休憩時間もしくは退勤時間が不適切な値です',
+        ]);
     }
 
     /** @test */
@@ -140,7 +146,9 @@ class AdminAttendanceDetailTest extends TestCase
             'note' => '',
         ]);
 
-        $response->assertSessionHasErrors(['note']);
+        $response->assertSessionHasErrors([
+            'note' => '備考を記入してください',
+        ]);
     }
 
 }

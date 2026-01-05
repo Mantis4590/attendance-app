@@ -69,14 +69,20 @@ class AttendanceUpdateRequest extends FormRequest
                             $validator->errors()->add("breaks.$index.end", '休憩時間が不適切な値です');
                         }
 
-                        // 出勤前に休憩開始はアウト
-                        if ($start->lessThan($in)) {
-                            $validator->errors()->add("breaks.$index.start", '休憩開始時間が不適切な値です');
+                        // 出勤前 or 退勤後に休憩開始
+                        if ($start->lessThan($in) || $start->greaterThan($out)) {
+                            $validator->errors()->add(
+                                    "breaks.$index.start",
+                                    '休憩時間が不適切な値です'
+                            );
                         }
 
-                        // 退勤後に休憩終了はアウト
+                       // 退勤後に休憩終了はアウト
                         if ($end->greaterThan($out)) {
-                            $validator->errors()->add("breaks.$index.end", '休憩終了時間もしくは退勤時間が不適切です');
+                            $validator->errors()->add(
+                                    "breaks.$index.end",
+                                    '休憩時間もしくは退勤時間が不適切な値です'
+                            );
                         }
                     }
                 }
