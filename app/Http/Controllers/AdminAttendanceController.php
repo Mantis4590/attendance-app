@@ -50,43 +50,42 @@ class AdminAttendanceController extends Controller
         ]);
     }
 
-    public function update(AdminAttendanceUpdateRequest $request, $id) {
+    public function update(AdminAttendanceUpdateRequest $request, $id)
+    {
         $attendance = Attendance::findOrFail($id);
+
+        // ✅ 出勤・退勤は必ず Carbon にする
+        $clockIn  = Carbon::createFromFormat('H:i', $request->clock_in);
+        $clockOut = Carbon::createFromFormat('H:i', $request->clock_out);
 
         // 出勤・退勤・備考
         $attendance->update([
-            'clock_in' => $request->clock_in,
-            'clock_out' => $request->clock_out,
-            'note' => $request->note,
+            'clock_in'  => $clockIn,
+            'clock_out' => $clockOut,
+            'note'      => $request->note,
         ]);
 
         // 既存の休憩を全削除
         $attendance->breakTimes()->delete();
 
-        // 休憩を再作成
+        // ✅ 修正②：休憩も Carbon で保存
         if ($request->filled('breaks')) {
-            foreach ($request->breaks as $break) {
-                if (
-                    !empty($break['start']) &&
-                    !empty($break['end'])
-                ) {
+            foreach ($request->breaks   as $break) {
+                if (!empty($break['start']) && !empty($break['end'])) {
                     $attendance->breakTimes()->create([
-                        'break_start' => $break['start'],
-                        'break_end' => $break['end'],
+                        'break_start' => Carbon::createFromFormat('H:i', $break['start']),
+                        'break_end'   => Carbon::createFromFormat('H:i', $break['end']),
                     ]);
                 }
             }
         }
 
-        // リレーションを再読み込み
+        // リレーション再読み込み
         $attendance->load('breakTimes');
 
-        // 休憩合計（分）を再計算
+        // ✅ 修正③：休憩合計（分）
         $totalBreakMinutes = $attendance->breakTimes
-            ->filter(fn ($breakTime) => $breakTime->break_start && $breakTime->break_end
-            )
-            ->sum(fn ($breakTime) => $breakTime->break_start->diffInMinutes($breakTime->break_end)
-            );
+            ->sum(fn ($b) => $b->break_start->diffInMinutes($b->break_end));
 
         $attendance->total_break = sprintf(
             '%02d:%02d',
@@ -94,57 +93,22 @@ class AdminAttendanceController extends Controller
             $totalBreakMinutes % 60
         );
 
-        // 勤務時間の再計算
-        if ($attendance->clock_in && $attendance->clock_out) {
-            $workMinutes =
-                $attendance->clock_in->diffInMinutes($attendance->clock_out)
-                - $totalBreakMinutes;
-                
-            $workMinutes = max(0, $workMinutes);
+        // ✅ 勤務時間（分）
+        $workMinutes =
+            $attendance->clock_in->diffInMinutes($attendance->clock_out)
+            - $totalBreakMinutes;
 
-            $attendance->total_work = sprintf(
-                '%02d:%02d',
-                intdiv($workMinutes, 60),
-                $workMinutes % 60
-            );
-        }
+        $workMinutes = max(0, $workMinutes);
+
+        $attendance->total_work = sprintf(
+            '%02d:%02d',
+            intdiv($workMinutes, 60),
+            $workMinutes % 60
+        );
 
         $attendance->save();
 
         return back()->with('success', '勤怠内容を修正しました');
-    }
-
-    // 出勤〜退勤の合同勤務時間（分）
-    private function calcWorkMinutes($in, $out, $breakStart, $breakEnd) {
-        if (!$in || !$out) {
-            return null;
-        }
-
-        $start = strtotime($in);
-        $end = strtotime($out);
-        $work = $end - $start;
-
-        // 休憩があれば引く
-        if ($breakStart && $breakEnd) {
-            $bStart = strtotime($breakStart);
-            $bEnd = strtotime($breakEnd);
-            $work -= max(0, $bEnd - $bStart);
-        }
-
-        return max(0, intdiv($work, 60));
-    }
-
-    // 休憩合計時間（分）
-    private function calcBreakMinutes($breakStart, $breakEnd) {
-        if (!$breakStart || !$breakEnd) {
-            return null;
-        }
-
-        $bStart = strtotime($breakStart);
-        $bEnd = strtotime($breakEnd);
-        $break = max(0, $bEnd - $bStart);
-
-        return intdiv($break, 60);
     }
 
     public function staff(Request $request, $id) {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\StampCorrectionRequest;
+use Carbon\Carbon;
 
 class AdminStampCorrectionRequestController extends Controller
 {
@@ -29,39 +30,67 @@ class AdminStampCorrectionRequestController extends Controller
         ]);
     }
 
-    public function approve(StampCorrectionRequest $stampCorrectionRequest) {
-        // 勤怠データ取得
+    public function approve(StampCorrectionRequest $stampCorrectionRequest)
+    {
         $attendance = $stampCorrectionRequest->attendance;
 
-        // 出退勤を更新
+        // 出退勤（Carbon化）
+        $clockIn  = Carbon::createFromFormat('H:i', $stampCorrectionRequest->clock_in);
+        $clockOut = Carbon::createFromFormat('H:i', $stampCorrectionRequest->clock_out);
+
         $attendance->update([
-            'clock_in' => $stampCorrectionRequest->clock_in,
-            'clock_out' => $stampCorrectionRequest->clock_out,
+            'clock_in' => $clockIn,
+            'clock_out' => $clockOut,
             'note' => $stampCorrectionRequest->note,
         ]);
 
-        // 休憩を更新;
+        // 休憩を全削除 → 再作成
         $attendance->breakTimes()->delete();
 
         foreach ($stampCorrectionRequest->breaks as $break) {
             $attendance->breakTimes()->create([
-                'break_start' => $break['start'],
-                'break_end' => $break['end'],
+                'break_start' => Carbon::createFromFormat('H:i', $break['start']),
+                'break_end'   => Carbon::createFromFormat('H:i', $break['end']),
             ]);
         }
 
-        // 申請ステータス更新
+        // 🔥 ここが今まで無かった
+        $attendance->load('breakTimes');
+
+        // 休憩合計（分）
+        $totalBreakMinutes = $attendance->breakTimes
+            ->sum(fn ($b) => $b->break_start->diffInMinutes($b->break_end));
+
+        $attendance->total_break = sprintf(
+            '%02d:%02d',
+            intdiv($totalBreakMinutes, 60),
+            $totalBreakMinutes % 60
+        );
+
+        // 勤務時間（分）
+        $workMinutes =
+            $attendance->clock_in->diffInMinutes($attendance->clock_out)
+            - $totalBreakMinutes;
+
+        $attendance->total_work = sprintf(
+            '%02d:%02d',
+            intdiv(max(0, $workMinutes), 60),
+            max(0, $workMinutes) % 60
+        );
+
+        $attendance->save();
+
+        // ステータス更新
         $stampCorrectionRequest->update([
             'status' => 'approved',
         ]);
 
-        // 同じ画面に戻す（遷移なし）
         return back()->with('approved', true);
     }
 
     public function show(StampCorrectionRequest $stampCorrectionRequest) {
         return view('admin.stamp_correction_request_show', [
-            'request' => $stampCorrectionRequest,
+                'request' => $stampCorrectionRequest,
             'attendance' => $stampCorrectionRequest->attendance,
             'user' => $stampCorrectionRequest->user,
         ]);
