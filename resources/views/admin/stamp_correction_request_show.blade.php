@@ -39,22 +39,17 @@
         {{-- 休憩 --}}
         @if (!empty($request->breaks))
             @foreach ($request->breaks as $index => $break)
-                @if (is_numeric($index))
+                @if (!empty($break['start']) || !empty($break['end']))
                     <div class="request-show__row">
-                        <div class="request-show__label">休憩{{ $index + 1 }}</div>
+                        <div class="request-show__label">休憩{{ $loop->iteration }}</div>
                         <div class="request-show__value">
-                            <span>{{ $break['start'] }}</span>
+                            <span>{{ $break['start'] ?? '-' }}</span>
                             <span>〜</span>
-                            <span>{{ $break['end'] }}</span>
+                            <span>{{ $break['end'] ?? '-' }}</span>
                         </div>
                     </div>
                 @endif
             @endforeach
-        @else
-            <div class="request-show__row">
-                <div class="request-show__label">休憩</div>
-                <div class="request-show__value">—</div>
-            </div>
         @endif
 
         {{-- 備考 --}}

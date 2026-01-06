@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\StampCorrectionRequest;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class AdminStampCorrectionRequestController extends Controller
 {
-    public function index(Request $request) {
-        // tab: pending / approved
+    public function index(Request $request)
+    {
         $tab = $request->query('tab', 'pending');
 
-        $query = StampCorrectionRequest::query()
-            ->with(['user', 'attendance']);
+        $query = StampCorrectionRequest::with(['user', 'attendance']);
 
         if ($tab === 'approved') {
             $query->where('status', 'approved');
@@ -22,11 +21,9 @@ class AdminStampCorrectionRequestController extends Controller
             $query->where('status', 'pending');
         }
 
-        $requests = $query->orderByDesc('created_at')->get();
-
         return view('admin.request_list', [
             'tab' => $tab,
-            'requests' => $requests,
+            'requests' => $query->orderByDesc('created_at')->get(),
         ]);
     }
 
@@ -34,14 +31,14 @@ class AdminStampCorrectionRequestController extends Controller
     {
         $attendance = $stampCorrectionRequest->attendance;
 
-        // 出退勤（Carbon化）
-        $clockIn  = Carbon::createFromFormat('H:i', $stampCorrectionRequest->clock_in);
-        $clockOut = Carbon::createFromFormat('H:i', $stampCorrectionRequest->clock_out);
+        // ✅ フォーマットを気にしない（これが肝）
+        $clockIn  = Carbon::parse($stampCorrectionRequest->clock_in);
+        $clockOut = Carbon::parse($stampCorrectionRequest->clock_out);
 
         $attendance->update([
-            'clock_in' => $clockIn,
+            'clock_in'  => $clockIn,
             'clock_out' => $clockOut,
-            'note' => $stampCorrectionRequest->note,
+            'note'      => $stampCorrectionRequest->note,
         ]);
 
         // 休憩を全削除 → 再作成
@@ -49,17 +46,18 @@ class AdminStampCorrectionRequestController extends Controller
 
         foreach ($stampCorrectionRequest->breaks as $break) {
             $attendance->breakTimes()->create([
-                'break_start' => Carbon::createFromFormat('H:i', $break['start']),
-                'break_end'   => Carbon::createFromFormat('H:i', $break['end']),
+                'break_start' => Carbon::parse($break['start']),
+                'break_end'   => Carbon::parse($break['end']),
             ]);
         }
 
-        // 🔥 ここが今まで無かった
+        // 再計算
         $attendance->load('breakTimes');
 
-        // 休憩合計（分）
         $totalBreakMinutes = $attendance->breakTimes
-            ->sum(fn ($b) => $b->break_start->diffInMinutes($b->break_end));
+            ->sum(fn ($breakTime) =>
+                $breakTime->break_start->diffInMinutes($breakTime->break_end)
+            );
 
         $attendance->total_break = sprintf(
             '%02d:%02d',
@@ -67,7 +65,6 @@ class AdminStampCorrectionRequestController extends Controller
             $totalBreakMinutes % 60
         );
 
-        // 勤務時間（分）
         $workMinutes =
             $attendance->clock_in->diffInMinutes($attendance->clock_out)
             - $totalBreakMinutes;
@@ -80,19 +77,19 @@ class AdminStampCorrectionRequestController extends Controller
 
         $attendance->save();
 
-        // ステータス更新
         $stampCorrectionRequest->update([
             'status' => 'approved',
         ]);
 
-        return back()->with('approved', true);
+        return back();
     }
 
-    public function show(StampCorrectionRequest $stampCorrectionRequest) {
+    public function show(StampCorrectionRequest $stampCorrectionRequest)
+    {
         return view('admin.stamp_correction_request_show', [
-                'request' => $stampCorrectionRequest,
+            'request'    => $stampCorrectionRequest,
             'attendance' => $stampCorrectionRequest->attendance,
-            'user' => $stampCorrectionRequest->user,
+            'user'       => $stampCorrectionRequest->user,
         ]);
     }
 }

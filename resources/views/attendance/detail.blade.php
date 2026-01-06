@@ -88,7 +88,8 @@
             @foreach ($displayBreaks as $index => $break)
 
                 <div class="attendance-detail__row">
-                    <div class="attendance-detail__label">休憩{{ $index + 1 }}</div>
+                    <div class="attendance-detail__label">休憩{{ $loop->iteration }}</div>
+
                     <div class="attendance-detail__value attendance-detail__value--time">
                         <input type="text" name="breaks[{{ $index }}][start]" value="{{ old("breaks.$index.start", $break->break_start?->format('H:i')) }}" class="time-input">
                         〜
@@ -107,7 +108,8 @@
 
             {{-- 追加の空行（必須） --}}
             <div class="attendance-detail__row">
-                <div class="attendance-detail__label">休憩{{ $attendance->breakTimes->count() + 1 }}</div>
+                <div class="attendance-detail__label">休憩{{ $displayBreaks->count() + 1 }}</div>
+
                 <div class="attendance-detail__value attendance-detail__value--time">
                 <input type="text" name="breaks[new][start]" value="{{ old('breaks.new.start') }}" class="time-input">
                 〜

@@ -12,10 +12,8 @@ class AttendanceController extends Controller
 {
     public function index()
     {
-        // 現在日時
         $now = now();
 
-        // 曜日を日本語に変換するための配列
         $weekMap = [
             'Mon' => '月',
             'Tue' => '火',
@@ -26,42 +24,44 @@ class AttendanceController extends Controller
             'Sun' => '日',
         ];
 
-        // 英語の曜日（Mon, Tue...）
-        $weekEng = $now->format('D');
-        // 日本語へ変換
-        $weekJp = $weekMap[$weekEng];
-
-        // 表示用の日付
+        $weekJp = $weekMap[$now->format('D')];
         $nowDate = $now->format("Y年n月j日({$weekJp})");
-
-        // 時刻
         $nowTime = $now->format('H:i');
 
-        // 今日の勤怠データ取得
-        $attendance = Attendance::where('user_id', auth()->id())
+        $attendance = Attendance::with('breakTimes')
+            ->where('user_id', auth()->id())
             ->where('date', $now->toDateString())
             ->first();
 
-        // ステータス判定
-        if (!$attendance) {
-            $status = "勤務外";
-        } else {
-            // 最新の休憩レコード
-            $latestBreak = $attendance->breakTimes()->latest()->first();
+        // デフォルト
+        $status = '勤務外';
 
-            if ($attendance->clock_out) {
-            $status = "退勤済";
-            } elseif ($latestBreak && is_null($latestBreak->break_end)) {
-                // break_end が null → 休憩中
-                $status = "休憩中";
-            } elseif ($attendance->clock_in) {
-            $status = "出勤中";
-            } else {
-                $status = "勤務外";
+        if ($attendance) {
+
+            // ① 休憩中判定（最優先）
+            $latestBreak = $attendance->breakTimes
+                ->sortByDesc('break_start')
+                ->first();
+
+            if ($latestBreak && is_null($latestBreak->break_end)) {
+                $status = '休憩中';
+
+            // ② 退勤済
+            } elseif (!is_null($attendance->clock_out)) {
+                $status = '退勤済';
+
+            // ③ 出勤中
+            } elseif (!is_null($attendance->clock_in)) {
+                $status = '出勤中';
             }
         }
 
-        return view('attendance.index', compact('nowDate', 'nowTime', 'status', 'attendance'));
+        return view('attendance.index', compact(
+            'nowDate',
+            'nowTime',
+            'status',
+            'attendance'
+        ));
     }
 
     public function clockIn() {
@@ -75,19 +75,21 @@ class AttendanceController extends Controller
         return back();
     }
 
-    public function startBreak() {
+    public function startBreak()
+    {
         $attendance = Attendance::where('user_id', auth()->id())
-            ->where('date', now()->toDateString())
-            ->first();
+            ->whereDate('date', today())
+            ->firstOrFail();
 
-        // 新しい休憩レコードを追加
+        // 休憩開始（条件は clock_in があることだけで十分）
         $attendance->breakTimes()->create([
             'break_start' => now(),
+            'break_end'   => null,
         ]);
 
-        // 状態変更
+        // 表示用ステータス
         $attendance->update([
-            'status' => '休憩中'
+            'status' => '休憩中',
         ]);
 
         return back();
